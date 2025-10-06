@@ -414,10 +414,12 @@ function switchTab(tabName) {
 function checkCoolingType(element) {
     const passes = element.value === 'modular';
     updateStatus('cooling', 1, passes);
+    saveCoolingData();
 }
 
 function checkCoolingStandard(number, passes) {
     updateStatus('cooling', number, passes);
+    saveCoolingData();
 }
 
 function checkCoolingPower(value) {
@@ -425,6 +427,7 @@ function checkCoolingPower(value) {
     const isLarge = currentObject.sizeCode == '1800';
     const minPower = isLarge ? 285 : 185;
     updateStatus('cooling', 3, value >= minPower);
+    saveCoolingData();
 }
 
 function checkPowerConsumption(value) {
@@ -432,22 +435,26 @@ function checkPowerConsumption(value) {
     const isLarge = currentObject.sizeCode == '1800';
     const maxPower = isLarge ? 220 : 155;
     updateStatus('cooling', 4, value <= maxPower);
+    saveCoolingData();
 }
 
 // Проверки для освещения
 function checkLightsStandard(number, passes) {
     updateStatus('lights', number, passes);
+    saveLightsData();
 }
 
 function checkLightsCount(value) {
     if (!currentObject) return;
     // Стандарт для всех катков - 4 опоры
     updateStatus('lights', 6, value == 4);
+    saveLightsData();
 }
 
 // Проверки для АБК
 function checkAbkStandard(number, passes) {
     updateStatus('abk', number, passes);
+    saveAbkData();
 }
 
 function checkAbkWalls(value) {
@@ -462,13 +469,38 @@ function checkAbkWalls(value) {
     } else {
         otherInput.style.display = 'none';
     }
+    
+    // Сохранить данные после изменения
+    saveAbkData();
 }
 
 // Сохранение данных по АБК
 function saveAbkData() {
     if (!currentObject) return;
     
+    // Получаем значения radio buttons
+    const abkFacadeRadio = document.querySelector('input[name="abk-facade"]:checked');
+    const abkRalFacadeRadio = document.querySelector('input[name="abk-ral-facade"]:checked');
+    const abkRoofRadio = document.querySelector('input[name="abk-roof"]:checked');
+    const abkWindowsRadio = document.querySelector('input[name="abk-windows"]:checked');
+    const abkDoorsRadio = document.querySelector('input[name="abk-doors"]:checked');
+    const abkFloorRadio = document.querySelector('input[name="abk-floor"]:checked');
+    const abkGatesAutoRadio = document.querySelector('input[name="abk-gates-auto"]:checked');
+    const abkCoolingIntegrationRadio = document.querySelector('input[name="abk-cooling-integration"]:checked');
+    const abkVentilationRadio = document.querySelector('input[name="abk-ventilation"]:checked');
+    const abkRalWindowsRadio = document.querySelector('input[name="abk-ral-windows"]:checked');
+    
     const data = {
+        abkFacade: abkFacadeRadio ? abkFacadeRadio.value : '',
+        abkRalFacade: abkRalFacadeRadio ? abkRalFacadeRadio.value : '',
+        abkRoof: abkRoofRadio ? abkRoofRadio.value : '',
+        abkWindows: abkWindowsRadio ? abkWindowsRadio.value : '',
+        abkDoors: abkDoorsRadio ? abkDoorsRadio.value : '',
+        abkFloor: abkFloorRadio ? abkFloorRadio.value : '',
+        abkGatesAuto: abkGatesAutoRadio ? abkGatesAutoRadio.value : '',
+        abkCoolingIntegration: abkCoolingIntegrationRadio ? abkCoolingIntegrationRadio.value : '',
+        abkVentilation: abkVentilationRadio ? abkVentilationRadio.value : '',
+        abkRalWindows: abkRalWindowsRadio ? abkRalWindowsRadio.value : '',
         supplier: document.getElementById('abk-supplier').value,
         manufacturer: document.getElementById('abk-manufacturer').value,
         cost: document.getElementById('abk-cost').value,
@@ -480,6 +512,8 @@ function saveAbkData() {
         wallsType: document.getElementById('abk-walls-type').value,
         wallsOther: document.getElementById('abk-walls-other').value
     };
+
+    console.log('🏢 Saving ABK data:', data);
     
     allObjectsData[currentObject.id].abk.data = data;
     saveData();
@@ -488,6 +522,7 @@ function saveAbkData() {
 // Проверки для хоккейного борта
 function checkBoardsStandard(number, passes) {
     updateStatus('boards', number, passes);
+    saveBoardsData();
 }
 
 function calculateUpperHeight() {
@@ -524,31 +559,54 @@ function checkUpperHeight() {
 // Проверки для инженерных систем
 function checkSystemsStandard(number, passes) {
     updateStatus('systems', number, passes);
+    saveSystemsData();
 }
 
 function checkSystemsAirExchange(value) {
     // Минимальная кратность для раздевалок - 5 раз/час (самое строгое требование)
     const passes = value >= 5;
     updateStatus('systems', 1, passes);
+    saveSystemsData();
 }
 
 function checkSystemsCCTV() {
     const value = document.getElementById('systems-cctv-internal').value;
     // Минимум 8 камер для внутреннего наблюдения
     updateStatus('systems', 7, value >= 8);
+    saveSystemsData();
 }
 
 function checkSystemsCCTVExternal() {
     const value = document.getElementById('systems-cctv-external').value;
     // Минимум 4 камеры для внешнего наблюдения
     updateStatus('systems', 8, value >= 4);
+    saveSystemsData();
 }
 
 // Сохранение данных по инженерным системам
 function saveSystemsData() {
     if (!currentObject) return;
     
+    // Получаем значения radio buttons
+    const systemsVentilationRadio = document.querySelector('input[name="systems-ventilation"]:checked');
+    const systemsAcRadio = document.querySelector('input[name="systems-ac"]:checked');
+    const systemsSoueRadio = document.querySelector('input[name="systems-soue"]:checked');
+    const systemsFireRadio = document.querySelector('input[name="systems-fire"]:checked');
+    const systemsLightingControlRadio = document.querySelector('input[name="systems-lighting-control"]:checked');
+    const systemsSkudRadio = document.querySelector('input[name="systems-skud"]:checked');
+    const systemsPumpRadio = document.querySelector('input[name="systems-pump"]:checked');
+    
     const data = {
+        // Radio buttons
+        systemsVentilation: systemsVentilationRadio ? systemsVentilationRadio.value : '',
+        systemsAc: systemsAcRadio ? systemsAcRadio.value : '',
+        systemsSoue: systemsSoueRadio ? systemsSoueRadio.value : '',
+        systemsFire: systemsFireRadio ? systemsFireRadio.value : '',
+        systemsLightingControl: systemsLightingControlRadio ? systemsLightingControlRadio.value : '',
+        systemsSkud: systemsSkudRadio ? systemsSkudRadio.value : '',
+        systemsPump: systemsPumpRadio ? systemsPumpRadio.value : '',
+        
+        // Number/Text inputs
         airExchange: document.getElementById('systems-air-exchange').value,
         ventilationManufacturer: document.getElementById('systems-ventilation-manufacturer').value,
         ventilationCost: document.getElementById('systems-ventilation-cost').value,
@@ -567,6 +625,8 @@ function saveSystemsData() {
         skudManufacturer: document.getElementById('systems-skud-manufacturer').value,
         skudCost: document.getElementById('systems-skud-cost').value
     };
+
+    console.log('⚙️ Saving systems data:', data);
     
     allObjectsData[currentObject.id].systems.data = data;
     saveData();
@@ -575,6 +635,7 @@ function saveSystemsData() {
 // Проверки для ледозаливочной машины
 function checkIceStandard(number, passes) {
     updateStatus('ice', number, passes);
+    saveIceData();
 }
 
 function checkIceArea(value) {
@@ -588,7 +649,11 @@ function checkIceArea(value) {
 function saveCoolingData() {
     if (!currentObject) return;
     
+    // Получаем значение radio button для cooling-type
+    const coolingTypeRadio = document.querySelector('input[name="cooling-type"]:checked');
+    
     const data = {
+        coolingType: coolingTypeRadio ? coolingTypeRadio.value : '',
         manufacturer: document.getElementById('cooling-manufacturer').value,
         cost: document.getElementById('cooling-cost').value,
         liquidVolume: document.getElementById('cooling-liquid-volume').value,
@@ -600,7 +665,9 @@ function saveCoolingData() {
         pipes: document.getElementById('cooling-pipes').value,
         joints: document.getElementById('cooling-joints').value
     };
-    
+
+    console.log('💾 Saving cooling data:', data);
+
     allObjectsData[currentObject.id].cooling.data = data;
     saveData();
 }
@@ -609,7 +676,17 @@ function saveCoolingData() {
 function saveLightsData() {
     if (!currentObject) return;
     
+    // Получаем значения radio buttons
+    const lightsEquipmentRadio = document.querySelector('input[name="lights-equipment"]:checked');
+    const lightsBoardRadio = document.querySelector('input[name="lights-board"]:checked');
+    const lightsTribuneRadio = document.querySelector('input[name="lights-tribune"]:checked');
+    const lightsAbkRadio = document.querySelector('input[name="lights-abk"]:checked');
+    
     const data = {
+        lightsEquipment: lightsEquipmentRadio ? lightsEquipmentRadio.value : '',
+        lightsBoard: lightsBoardRadio ? lightsBoardRadio.value : '',
+        lightsTribune: lightsTribuneRadio ? lightsTribuneRadio.value : '',
+        lightsAbk: lightsAbkRadio ? lightsAbkRadio.value : '',
         manufacturerPoles: document.getElementById('lights-manufacturer-poles').value,
         costPoles: document.getElementById('lights-cost-poles').value,
         manufacturerAhp: document.getElementById('lights-manufacturer-ahp').value,
@@ -617,6 +694,8 @@ function saveLightsData() {
         height: document.getElementById('lights-height').value,
         count: document.getElementById('lights-count').value
     };
+
+    console.log('💡 Saving lights data:', data);
     
     allObjectsData[currentObject.id].lights.data = data;
     saveData();
@@ -626,7 +705,23 @@ function saveLightsData() {
 function saveBoardsData() {
     if (!currentObject) return;
     
+    // Получаем значения radio buttons
+    const boardsZincRadio = document.querySelector('input[name="boards-zinc"]:checked');
+    const boardsRgbwRadio = document.querySelector('input[name="boards-rgbw"]:checked');
+    const boardsDmxRadio = document.querySelector('input[name="boards-dmx"]:checked');
+    const boardsInnerScratchRadio = document.querySelector('input[name="boards-inner-scratch"]:checked');
+    const boardsOuterScratchRadio = document.querySelector('input[name="boards-outer-scratch"]:checked');
+    const boardsPanelRadio = document.querySelector('input[name="boards-panel"]:checked');
+    const boardsAluminumRadio = document.querySelector('input[name="boards-aluminum"]:checked');
+    
     const data = {
+        boardsZinc: boardsZincRadio ? boardsZincRadio.value : '',
+        boardsRgbw: boardsRgbwRadio ? boardsRgbwRadio.value : '',
+        boardsDmx: boardsDmxRadio ? boardsDmxRadio.value : '',
+        boardsInnerScratch: boardsInnerScratchRadio ? boardsInnerScratchRadio.value : '',
+        boardsOuterScratch: boardsOuterScratchRadio ? boardsOuterScratchRadio.value : '',
+        boardsPanel: boardsPanelRadio ? boardsPanelRadio.value : '',
+        boardsAluminum: boardsAluminumRadio ? boardsAluminumRadio.value : '',
         manufacturer: document.getElementById('boards-manufacturer').value,
         cost: document.getElementById('boards-cost').value,
         frameThickness: document.getElementById('boards-frame-thickness').value,
@@ -646,7 +741,11 @@ function saveBoardsData() {
 function saveIceData() {
     if (!currentObject) return;
     
+    // Получаем значение radio button для ice-engine
+    const iceEngineRadio = document.querySelector('input[name="ice-engine"]:checked');
+    
     const data = {
+        iceEngine: iceEngineRadio ? iceEngineRadio.value : '',
         manufacturer: document.getElementById('ice-manufacturer').value,
         cost: document.getElementById('ice-cost').value,
         area: document.getElementById('ice-area').value,
@@ -772,6 +871,51 @@ function loadAllDataFromLocalStorage() {
     }
 }
 
+// Вспомогательная функция для восстановления radio button с миграцией
+function restoreRadioButton(radioName, savedValue, statusCategory, statusNumber) {
+    console.log(`🔍 Restoring radio: ${radioName}, savedValue: "${savedValue}", status: ${statusCategory}[${statusNumber}]`);
+    
+    if (savedValue) {
+        const radioButton = document.querySelector(`input[name="${radioName}"][value="${savedValue}"]`);
+        console.log(`🔎 Looking for: input[name="${radioName}"][value="${savedValue}"]`, radioButton);
+        if (radioButton) {
+            radioButton.checked = true;
+            console.log(`✅ Restored ${radioName} to ${savedValue} - checked: ${radioButton.checked}`);
+        } else {
+            console.warn(`❌ Could not find radio button: input[name="${radioName}"][value="${savedValue}"]`);
+        }
+    } else if (!currentObject) {
+        console.log(`⚠️ No currentObject, skipping migration`);
+        return;
+    } else {
+        // Миграция: определяем значение из статуса
+        const status = allObjectsData[currentObject.id][statusCategory].statuses[statusNumber];
+        console.log(`📊 Status for ${statusCategory}[${statusNumber}]: ${status}`);
+        
+        if (status === 'pass') {
+            const radioButton = document.querySelector(`input[name="${radioName}"][value="yes"]`) || 
+                               document.querySelector(`input[name="${radioName}"][value="modular"]`) ||
+                               document.querySelector(`input[name="${radioName}"][value="dvs"]`);
+            if (radioButton) {
+                radioButton.checked = true;
+                console.log(`✅ Migrated ${radioName} to ${radioButton.value} (from pass status)`);
+            } else {
+                console.warn(`❌ Could not find any radio button for ${radioName} migration (pass)`);
+            }
+        } else if (status === 'fail') {
+            const radioButton = document.querySelector(`input[name="${radioName}"][value="no"]`) ||
+                               document.querySelector(`input[name="${radioName}"][value="other"]`) ||
+                               document.querySelector(`input[name="${radioName}"][value="electric"]`);
+            if (radioButton) {
+                radioButton.checked = true;
+                console.log(`✅ Migrated ${radioName} to ${radioButton.value} (from fail status)`);
+            } else {
+                console.warn(`❌ Could not find any radio button for ${radioName} migration (fail)`);
+            }
+        }
+    }
+}
+
 // Загрузка данных объекта из хранилища
 function loadObjectDataFromStorage() {
     if (!currentObject) return;
@@ -804,6 +948,10 @@ function loadObjectDataFromStorage() {
     // Загрузка данных холодильной установки
     if (data.cooling.data) {
         const coolingData = data.cooling.data;
+        
+        // Восстановить radio button для cooling-type с миграцией
+        restoreRadioButton('cooling-type', coolingData.coolingType, 'cooling', 1);
+        
         if (coolingData.manufacturer) document.getElementById('cooling-manufacturer').value = coolingData.manufacturer;
         if (coolingData.cost) document.getElementById('cooling-cost').value = coolingData.cost;
         if (coolingData.liquidVolume) document.getElementById('cooling-liquid-volume').value = coolingData.liquidVolume;
@@ -819,6 +967,13 @@ function loadObjectDataFromStorage() {
     // Загрузка данных освещения
     if (data.lights.data) {
         const lightsData = data.lights.data;
+        
+        // Восстановить radio buttons с миграцией
+        restoreRadioButton('lights-equipment', lightsData.lightsEquipment, 'lights', 1);
+        restoreRadioButton('lights-board', lightsData.lightsBoard, 'lights', 3);
+        restoreRadioButton('lights-tribune', lightsData.lightsTribune, 'lights', 4);
+        restoreRadioButton('lights-abk', lightsData.lightsAbk, 'lights', 5);
+        
         if (lightsData.manufacturerPoles) document.getElementById('lights-manufacturer-poles').value = lightsData.manufacturerPoles;
         if (lightsData.costPoles) document.getElementById('lights-cost-poles').value = lightsData.costPoles;
         if (lightsData.manufacturerAhp) document.getElementById('lights-manufacturer-ahp').value = lightsData.manufacturerAhp;
@@ -830,6 +985,19 @@ function loadObjectDataFromStorage() {
     // Загрузка данных АБК
     if (data.abk.data) {
         const abkData = data.abk.data;
+        
+        // Восстановить radio buttons с миграцией
+        restoreRadioButton('abk-facade', abkData.abkFacade, 'abk', 1);
+        restoreRadioButton('abk-ral-facade', abkData.abkRalFacade, 'abk', 2);
+        restoreRadioButton('abk-roof', abkData.abkRoof, 'abk', 3);
+        restoreRadioButton('abk-windows', abkData.abkWindows, 'abk', 4);
+        restoreRadioButton('abk-doors', abkData.abkDoors, 'abk', 5);
+        restoreRadioButton('abk-floor', abkData.abkFloor, 'abk', 7);
+        restoreRadioButton('abk-gates-auto', abkData.abkGatesAuto, 'abk', 8);
+        restoreRadioButton('abk-cooling-integration', abkData.abkCoolingIntegration, 'abk', 12);
+        restoreRadioButton('abk-ventilation', abkData.abkVentilation, 'abk', 13);
+        restoreRadioButton('abk-ral-windows', abkData.abkRalWindows, 'abk', 15);
+        
         if (abkData.supplier) document.getElementById('abk-supplier').value = abkData.supplier;
         if (abkData.manufacturer) document.getElementById('abk-manufacturer').value = abkData.manufacturer;
         if (abkData.cost) document.getElementById('abk-cost').value = abkData.cost;
@@ -850,6 +1018,16 @@ function loadObjectDataFromStorage() {
     // Загрузка данных хоккейного борта
     if (data.boards.data) {
         const boardsData = data.boards.data;
+        
+        // Восстановить radio buttons с миграцией
+        restoreRadioButton('boards-zinc', boardsData.boardsZinc, 'boards', 1);
+        restoreRadioButton('boards-rgbw', boardsData.boardsRgbw, 'boards', 6);
+        restoreRadioButton('boards-dmx', boardsData.boardsDmx, 'boards', 7);
+        restoreRadioButton('boards-inner-scratch', boardsData.boardsInnerScratch, 'boards', 8);
+        restoreRadioButton('boards-outer-scratch', boardsData.boardsOuterScratch, 'boards', 10);
+        restoreRadioButton('boards-panel', boardsData.boardsPanel, 'boards', 12);
+        restoreRadioButton('boards-aluminum', boardsData.boardsAluminum, 'boards', 13);
+        
         if (boardsData.manufacturer) document.getElementById('boards-manufacturer').value = boardsData.manufacturer;
         if (boardsData.cost) document.getElementById('boards-cost').value = boardsData.cost;
         if (boardsData.frameThickness) document.getElementById('boards-frame-thickness').value = boardsData.frameThickness;
@@ -864,6 +1042,16 @@ function loadObjectDataFromStorage() {
     // Загрузка данных инженерных систем
     if (data.systems.data) {
         const systemsData = data.systems.data;
+        
+        // Восстановить radio buttons с миграцией
+        restoreRadioButton('systems-ventilation', systemsData.systemsVentilation, 'systems', 2);
+        restoreRadioButton('systems-ac', systemsData.systemsAc, 'systems', 3);
+        restoreRadioButton('systems-soue', systemsData.systemsSoue, 'systems', 4);
+        restoreRadioButton('systems-fire', systemsData.systemsFire, 'systems', 5);
+        restoreRadioButton('systems-lighting-control', systemsData.systemsLightingControl, 'systems', 6);
+        restoreRadioButton('systems-skud', systemsData.systemsSkud, 'systems', 9);
+        restoreRadioButton('systems-pump', systemsData.systemsPump, 'systems', 10);
+        
         if (systemsData.airExchange) document.getElementById('systems-air-exchange').value = systemsData.airExchange;
         if (systemsData.ventilationManufacturer) document.getElementById('systems-ventilation-manufacturer').value = systemsData.ventilationManufacturer;
         if (systemsData.ventilationCost) document.getElementById('systems-ventilation-cost').value = systemsData.ventilationCost;
@@ -886,6 +1074,10 @@ function loadObjectDataFromStorage() {
     // Загрузка данных ледозаливочной машины
     if (data.ice.data) {
         const iceData = data.ice.data;
+        
+        // Восстановить radio button для ice-engine с миграцией
+        restoreRadioButton('ice-engine', iceData.iceEngine, 'ice', 1);
+        
         if (iceData.manufacturer) document.getElementById('ice-manufacturer').value = iceData.manufacturer;
         if (iceData.cost) document.getElementById('ice-cost').value = iceData.cost;
         if (iceData.area) document.getElementById('ice-area').value = iceData.area;
