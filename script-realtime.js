@@ -345,7 +345,6 @@ function updateSummaryTable() {
             <td class="check-status">${getStatusIcon(sectionStatuses.systems)}</td>
             <td class="check-status">${getStatusIcon(sectionStatuses.ice)}</td>
             <td class="check-status">${getStatusIcon(sectionStatuses.coverage)}</td>
-            <td><span class="compliance-badge ${complianceClass}">${compliance}%</span></td>
             <td><button class="edit-btn" onclick="openDetailView(${obj.id})">Проверить</button></td>
         `;
         
