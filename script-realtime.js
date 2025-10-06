@@ -55,17 +55,16 @@ function initialize() {
     // Инициализация данных для всех объектов
     objects.forEach(obj => {
         if (!allObjectsData[obj.id]) {
-            allObjectsData[obj.id] = {
-                cooling: {statuses: {}, data: {}},
-                lights: {statuses: {}, data: {}},
-                abk: {statuses: {}, data: {}},
-                boards: {statuses: {}, data: {}},
-                furniture: {statuses: {}, data: {}},
-                systems: {statuses: {}, data: {}},
-                ice: {statuses: {}, data: {}}
-            };
-            
-            // Инициализация статусов для холодильной установки (7 критериев соответствия)
+        allObjectsData[obj.id] = {
+            cooling: {statuses: {}, data: {}},
+            lights: {statuses: {}, data: {}},
+            abk: {statuses: {}, data: {}},
+            boards: {statuses: {}, data: {}},
+            furniture: {statuses: {}, data: {}},
+            systems: {statuses: {}, data: {}},
+            ice: {statuses: {}, data: {}},
+            coverage: {statuses: {}, data: {}}
+        };            // Инициализация статусов для холодильной установки (7 критериев соответствия)
             for (let i = 1; i <= 7; i++) {
                 allObjectsData[obj.id].cooling.statuses[i] = 'pending';
             }
@@ -98,6 +97,11 @@ function initialize() {
             // Инициализация статусов для ледозаливочной машины (7 критериев)
             for (let i = 1; i <= 7; i++) {
                 allObjectsData[obj.id].ice.statuses[i] = 'pending';
+            }
+            
+            // Инициализация статусов для покрытий площадки (7 критериев)
+            for (let i = 1; i <= 7; i++) {
+                allObjectsData[obj.id].coverage.statuses[i] = 'pending';
             }
         }
     });
@@ -243,7 +247,7 @@ function updateSummaryTable() {
         const data = allObjectsData[obj.id];
         
         // Подсчет статусов для каждого раздела
-        const sections = ['cooling', 'lights', 'abk', 'boards', 'furniture', 'systems', 'ice'];
+        const sections = ['cooling', 'lights', 'abk', 'boards', 'furniture', 'systems', 'ice', 'coverage'];
         const sectionStatuses = {};
         let totalPass = 0;
         let totalFail = 0;
@@ -301,6 +305,13 @@ function updateSummaryTable() {
                     else if (status === 'fail') fail++;
                     else pending++;
                 }
+            } else if (section === 'coverage') {
+                for (let i = 1; i <= 7; i++) {
+                    const status = data.coverage.statuses[i];
+                    if (status === 'pass') pass++;
+                    else if (status === 'fail') fail++;
+                    else pending++;
+                }
             }
             
             sectionStatuses[section] = {pass, fail, pending};
@@ -333,6 +344,7 @@ function updateSummaryTable() {
             <td class="check-status">${getStatusIcon(sectionStatuses.furniture)}</td>
             <td class="check-status">${getStatusIcon(sectionStatuses.systems)}</td>
             <td class="check-status">${getStatusIcon(sectionStatuses.ice)}</td>
+            <td class="check-status">${getStatusIcon(sectionStatuses.coverage)}</td>
             <td><span class="compliance-badge ${complianceClass}">${compliance}%</span></td>
             <td><button class="edit-btn" onclick="openDetailView(${obj.id})">Проверить</button></td>
         `;
@@ -659,6 +671,47 @@ function checkIceArea(value) {
     const isLarge = currentObject.sizeCode == '1800';
     const minArea = isLarge ? 1800 : 800;
     updateStatus('ice', 2, value >= minArea);
+}
+
+// Проверки для покрытий площадки
+function checkCoverageStandard(number, passes) {
+    updateStatus('coverage', number, passes);
+    saveCoverageData();
+}
+
+function checkDPKType(value) {
+    const passes = value === 'solid';
+    updateStatus('coverage', 4, passes);
+    saveCoverageData();
+}
+
+// Сохранение данных по покрытиям площадки
+function saveCoverageData() {
+    if (!currentObject) return;
+    
+    const multifunctionalRadio = document.querySelector('input[name="coverage-multifunctional"]:checked');
+    const replaceableRadio = document.querySelector('input[name="coverage-replaceable"]:checked');
+    const dpkVandalRadio = document.querySelector('input[name="coverage-dpk-vandal"]:checked');
+    const markingRadio = document.querySelector('input[name="coverage-marking"]:checked');
+    
+    const data = {
+        manufacturer: document.getElementById('coverage-manufacturer').value,
+        cost: document.getElementById('coverage-cost').value,
+        dpkManufacturer: document.getElementById('coverage-dpk-manufacturer').value,
+        dpkCost: document.getElementById('coverage-dpk-cost').value,
+        multifunctional: multifunctionalRadio ? multifunctionalRadio.value : '',
+        thickness: document.getElementById('coverage-thickness').value,
+        replaceable: replaceableRadio ? replaceableRadio.value : '',
+        dpkType: document.getElementById('coverage-dpk-type').value,
+        dpkVandal: dpkVandalRadio ? dpkVandalRadio.value : '',
+        rubberThickness: document.getElementById('coverage-rubber-thickness').value,
+        marking: markingRadio ? markingRadio.value : ''
+    };
+
+    console.log('🏗️ Saving coverage data:', data);
+    
+    allObjectsData[currentObject.id].coverage.data = data;
+    saveData();
 }
 
 // Сохранение данных по холодильной установке
@@ -1237,6 +1290,25 @@ function loadObjectDataFromStorage() {
         if (iceData.weight) document.getElementById('ice-weight').value = iceData.weight;
     }
     
+    // Загрузка данных покрытий площадки
+    if (data.coverage.data) {
+        const coverageData = data.coverage.data;
+        
+        // Восстановить radio buttons с миграцией
+        restoreRadioButton('coverage-multifunctional', coverageData.multifunctional, 'coverage', 1);
+        restoreRadioButton('coverage-replaceable', coverageData.replaceable, 'coverage', 3);
+        restoreRadioButton('coverage-dpk-vandal', coverageData.dpkVandal, 'coverage', 5);
+        restoreRadioButton('coverage-marking', coverageData.marking, 'coverage', 7);
+        
+        if (coverageData.manufacturer) document.getElementById('coverage-manufacturer').value = coverageData.manufacturer;
+        if (coverageData.cost) document.getElementById('coverage-cost').value = coverageData.cost;
+        if (coverageData.dpkManufacturer) document.getElementById('coverage-dpk-manufacturer').value = coverageData.dpkManufacturer;
+        if (coverageData.dpkCost) document.getElementById('coverage-dpk-cost').value = coverageData.dpkCost;
+        if (coverageData.thickness) document.getElementById('coverage-thickness').value = coverageData.thickness;
+        if (coverageData.dpkType) document.getElementById('coverage-dpk-type').value = coverageData.dpkType;
+        if (coverageData.rubberThickness) document.getElementById('coverage-rubber-thickness').value = coverageData.rubberThickness;
+    }
+    
     // Обновление статусов для холодильной установки
     for (let i = 1; i <= 7; i++) {
         const status = data.cooling.statuses[i];
@@ -1356,6 +1428,23 @@ function loadObjectDataFromStorage() {
         }
     }
     
+    // Обновление статусов для покрытий площадки
+    for (let i = 1; i <= 7; i++) {
+        const status = data.coverage.statuses[i];
+        if (status && status !== 'pending') {
+            const statusElement = document.getElementById(`coverage-status-${i}`);
+            if (statusElement) {
+                if (status === 'pass') {
+                    statusElement.className = 'status-indicator status-pass';
+                    statusElement.textContent = '✓ Соответствует';
+                } else {
+                    statusElement.className = 'status-indicator status-fail';
+                    statusElement.textContent = '✗ Не соответствует';
+                }
+            }
+        }
+    }
+    
     // Пересчет высоты борта если есть данные
     if (data.boards.data && data.boards.data.lowerHeight) {
         calculateUpperHeight();
@@ -1372,15 +1461,16 @@ function exportSummary() {
     csvContent += "Сводный отчет проверки соответствия оборудования стандартам\n";
     csvContent += `Дата формирования:;${new Date().toLocaleDateString('ru-RU')}\n\n`;
     
-    csvContent += "№;Объект;Округ;Размер;Холодильная установка;Освещение;АБК;Хоккейный борт;Оснащение АБК;Инженерные системы;Ледозаливочная машина;% соответствия;";
+    csvContent += "№;Объект;Округ;Размер;Холодильная установка;Освещение;АБК;Хоккейный борт;Оснащение АБК;Инженерные системы;Ледозаливочная машина;Покрытия площадки;% соответствия;";
     csvContent += "Производитель ХУ;Стоимость ХУ;Объем хладагента;Стоимость хладагента;";
     csvContent += "Производитель опор;Стоимость опор;Производитель АХП;Стоимость АХП;";
     csvContent += "Производитель борта;Стоимость борта;";
-    csvContent += "Производитель ледозаливочной;Стоимость ледозаливочной\n";
+    csvContent += "Производитель ледозаливочной;Стоимость ледозаливочной;";
+    csvContent += "Производитель покрытия;Стоимость покрытия;Производитель ДПК;Стоимость ДПК\n";
     
     objects.forEach(obj => {
         const data = allObjectsData[obj.id];
-        const sections = ['cooling', 'lights', 'abk', 'boards', 'furniture', 'systems', 'ice'];
+        const sections = ['cooling', 'lights', 'abk', 'boards', 'furniture', 'systems', 'ice', 'coverage'];
         const statuses = [];
         let totalPass = 0;
         let totalFail = 0;
@@ -1437,6 +1527,13 @@ function exportSummary() {
                     else if (status === 'fail') fail++;
                     else pending++;
                 }
+            } else if (section === 'coverage') {
+                for (let i = 1; i <= 7; i++) {
+                    const status = data.coverage.statuses[i];
+                    if (status === 'pass') pass++;
+                    else if (status === 'fail') fail++;
+                    else pending++;
+                }
             }
             
             totalPass += pass;
@@ -1461,6 +1558,7 @@ function exportSummary() {
         const lightsData = data.lights.data || {};
         const boardsData = data.boards.data || {};
         const iceData = data.ice.data || {};
+        const coverageData = data.coverage.data || {};
         
         csvContent += `${obj.id};${obj.name};${obj.district};${obj.size};`;
         csvContent += statuses.join(';') + ';';
@@ -1476,7 +1574,11 @@ function exportSummary() {
         csvContent += `${boardsData.manufacturer || ''};`;
         csvContent += `${boardsData.cost || ''};`;
         csvContent += `${iceData.manufacturer || ''};`;
-        csvContent += `${iceData.cost || ''}\n`;
+        csvContent += `${iceData.cost || ''};`;
+        csvContent += `${coverageData.manufacturer || ''};`;
+        csvContent += `${coverageData.cost || ''};`;
+        csvContent += `${coverageData.dpkManufacturer || ''};`;
+        csvContent += `${coverageData.dpkCost || ''}\n`;
     });
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

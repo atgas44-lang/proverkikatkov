@@ -35,6 +35,7 @@
                             <th>🪑 Осн</th>
                             <th>⚙️ Сист</th>
                             <th>🚜 Лед</th>
+                            <th>🏗️ Покр</th>
                             <th>Соответствие</th>
                             <th>Действия</th>
                         </tr>
@@ -50,7 +51,7 @@
                 <div class="summary-cards">
                     <div class="summary-card">
                         <h4>Всего проверок</h4>
-                        <div class="value" id="totalChecks">825</div>
+                        <div class="value" id="totalChecks">902</div>
                     </div>
                     <div class="summary-card pass">
                         <h4>✅ Соответствует</h4>
@@ -62,7 +63,7 @@
                     </div>
                     <div class="summary-card pending">
                         <h4>⏳ Не проверено</h4>
-                        <div class="value" id="globalPending">825</div>
+                        <div class="value" id="globalPending">902</div>
                     </div>
                 </div>
             </div>
@@ -104,6 +105,7 @@
                     <button class="tab" onclick="switchTab('furniture')">🪑 Оснащение АБК</button>
                     <button class="tab" onclick="switchTab('systems')">⚙️ Инженерные системы</button>
                     <button class="tab" onclick="switchTab('ice')">🚜 Ледозаливочная машина</button>
+                    <button class="tab" onclick="switchTab('coverage')">🏗️ Покрытия площадки</button>
                 </div>
                 
                 <!-- Холодильная установка -->
@@ -1531,6 +1533,210 @@
                             </div>
                             <div class="info-note">
                                 <strong>СанПиН требование:</strong> Минимум 30 м³/час для медкабинета площадью 15-20 м²
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="coverage" class="tab-content">
+                    <div class="checklist">
+                        <!-- Информационные поля -->
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number info-icon">★</span>
+                                Производитель конечный покрытия на площадку
+                            </div>
+                            <div class="input-group">
+                                <input type="text" class="text-input" id="coverage-manufacturer" 
+                                    placeholder="Введите наименование производителя" 
+                                    onchange="saveCoverageData()">
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number info-icon">★</span>
+                                Стоимость покрытия на площадку за м²
+                            </div>
+                            <div class="input-group">
+                                <div class="currency-input-wrapper">
+                                    <input type="number" class="number-input currency-input" id="coverage-cost" 
+                                        placeholder="Стоимость за м²" 
+                                        onchange="saveCoverageData()">
+                                    <span class="currency-label">руб/м²</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number info-icon">★</span>
+                                Производитель ДПК
+                            </div>
+                            <div class="input-group">
+                                <input type="text" class="text-input" id="coverage-dpk-manufacturer" 
+                                    placeholder="Введите наименование производителя ДПК" 
+                                    onchange="saveCoverageData()">
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number info-icon">★</span>
+                                Стоимость ДПК за м²
+                            </div>
+                            <div class="input-group">
+                                <div class="currency-input-wrapper">
+                                    <input type="number" class="number-input currency-input" id="coverage-dpk-cost" 
+                                        placeholder="Стоимость ДПК за м²" 
+                                        onchange="saveCoverageData()">
+                                    <span class="currency-label">руб/м²</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Критерии соответствия -->
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">1</span>
+                                Покрытие на площадку многофункциональное?
+                                <span class="status-indicator status-pending" id="coverage-status-1">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-multifunctional" value="yes" onchange="checkCoverageStandard(1, true)">
+                                        Да, многофункциональное
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-multifunctional" value="no" onchange="checkCoverageStandard(1, false)">
+                                        Нет / однофункциональное
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Многофункциональное покрытие позволяет проводить различные виды спорта и мероприятий
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">2</span>
+                                Толщина покрытия?
+                                <span class="status-indicator status-pending" id="coverage-status-2">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" class="number-input" id="coverage-thickness" 
+                                    placeholder="Толщина в мм" 
+                                    onchange="checkCoverageStandard(2, this.value >= 15)">
+                                <span>мм (минимум 15 мм)</span>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Минимум 15 мм для амортизации и защиты от травм при падениях
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">3</span>
+                                Покрытие на площадку легко заменяется?
+                                <span class="status-indicator status-pending" id="coverage-status-3">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-replaceable" value="yes" onchange="checkCoverageStandard(3, true)">
+                                        Да, легкозаменяемое
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-replaceable" value="no" onchange="checkCoverageStandard(3, false)">
+                                        Нет / сложная замена
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Преимущество:</strong> Модульная система позволяет заменять отдельные секции при повреждении
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">4</span>
+                                Тип ДПК вокруг площадки?
+                                <span class="status-indicator status-pending" id="coverage-status-4">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <select class="select-input" id="coverage-dpk-type" onchange="checkDPKType(this.value)">
+                                    <option value="">-- Выберите тип --</option>
+                                    <option value="solid">Полнотелое ✓</option>
+                                    <option value="hollow">Пустотелое</option>
+                                </select>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Полнотелое ДПК - выдерживает большие нагрузки, не деформируется, срок службы 25+ лет
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">5</span>
+                                ДПК вандалоустойчивое?
+                                <span class="status-indicator status-pending" id="coverage-status-5">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-dpk-vandal" value="yes" onchange="checkCoverageStandard(5, true)">
+                                        Да, вандалоустойчивое
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-dpk-vandal" value="no" onchange="checkCoverageStandard(5, false)">
+                                        Нет / обычное
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Требования:</strong> Класс износостойкости не ниже 33, устойчивость к царапинам и ударам
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">6</span>
+                                Резина для подхода на каток от АБК более 6 мм?
+                                <span class="status-indicator status-pending" id="coverage-status-6">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" class="number-input" id="coverage-rubber-thickness" 
+                                    placeholder="Толщина в мм" 
+                                    onchange="checkCoverageStandard(6, this.value > 6)">
+                                <span>мм (более 6 мм)</span>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт безопасности:</strong> Резина толщиной более 6 мм предотвращает скольжение в коньках
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">7</span>
+                                Возможность нанесения разметки на покрытие площадки?
+                                <span class="status-indicator status-pending" id="coverage-status-7">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-marking" value="yes" onchange="checkCoverageStandard(7, true)">
+                                        Да, возможна разметка
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="coverage-marking" value="no" onchange="checkCoverageStandard(7, false)">
+                                        Нет
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Преимущество:</strong> Возможность нанесения разметки для разных видов спорта без повреждения покрытия
                             </div>
                         </div>
                     </div>
