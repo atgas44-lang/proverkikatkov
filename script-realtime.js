@@ -85,6 +85,11 @@ function initialize() {
                 allObjectsData[obj.id].boards.statuses[i] = 'pending';
             }
             
+            // Инициализация статусов для оснащения АБК (мебели) (15 критериев)
+            for (let i = 1; i <= 15; i++) {
+                allObjectsData[obj.id].furniture.statuses[i] = 'pending';
+            }
+            
             // Инициализация статусов для инженерных систем (10 критериев)
             for (let i = 1; i <= 10; i++) {
                 allObjectsData[obj.id].systems.statuses[i] = 'pending';
@@ -271,6 +276,13 @@ function updateSummaryTable() {
             } else if (section === 'boards') {
                 for (let i = 1; i <= 14; i++) {
                     const status = data.boards.statuses[i];
+                    if (status === 'pass') pass++;
+                    else if (status === 'fail') fail++;
+                    else pending++;
+                }
+            } else if (section === 'furniture') {
+                for (let i = 1; i <= 15; i++) {
+                    const status = data.furniture.statuses[i];
                     if (status === 'pass') pass++;
                     else if (status === 'fail') fail++;
                     else pending++;
@@ -517,6 +529,18 @@ function checkBoardsStandard(number, passes) {
     saveBoardsData();
 }
 
+// Проверки для оснащения АБК (мебели)
+function checkFurnitureStandard(number, passes) {
+    updateStatus('furniture', number, passes);
+    saveFurnitureData();
+}
+
+function checkWaterSupply(value) {
+    const passes = value === 'purifier' || value === 'fountain';
+    updateStatus('furniture', 9, passes);
+    saveFurnitureData();
+}
+
 function calculateUpperHeight() {
     const lowerHeight = document.getElementById('boards-lower-height').value;
     if (lowerHeight) {
@@ -690,6 +714,48 @@ function saveLightsData() {
     console.log('💡 Saving lights data:', data);
     
     allObjectsData[currentObject.id].lights.data = data;
+    saveData();
+}
+
+// Сохранение данных по оснащению АБК (мебели)
+function saveFurnitureData() {
+    if (!currentObject) return;
+    
+    // Получаем значения radio buttons
+    const furnitureSharpenerRadio = document.querySelector('input[name="furniture-sharpener"]:checked');
+    const furnitureLockRadio = document.querySelector('input[name="furniture-lock"]:checked');
+    const furniturePanelsRadio = document.querySelector('input[name="furniture-panels"]:checked');
+    const furnitureCounterFinishRadio = document.querySelector('input[name="furniture-counter-finish"]:checked');
+    const furnitureCountertopRadio = document.querySelector('input[name="furniture-countertop"]:checked');
+    const furnitureChangingTableRadio = document.querySelector('input[name="furniture-changing-table"]:checked');
+    const furnitureChairsOutdoorRadio = document.querySelector('input[name="furniture-chairs-outdoor"]:checked');
+    const furnitureChairsStackRadio = document.querySelector('input[name="furniture-chairs-stack"]:checked');
+    const furnitureStorageRadio = document.querySelector('input[name="furniture-storage"]:checked');
+    const furnitureDryerStorageRadio = document.querySelector('input[name="furniture-dryer-storage"]:checked');
+    const furnitureMedicalCouchRadio = document.querySelector('input[name="furniture-medical-couch"]:checked');
+    const furnitureRecirculatorRadio = document.querySelector('input[name="furniture-recirculator"]:checked');
+    
+    const data = {
+        furnitureSharpener: furnitureSharpenerRadio ? furnitureSharpenerRadio.value : '',
+        furnitureLock: furnitureLockRadio ? furnitureLockRadio.value : '',
+        furniturePanels: furniturePanelsRadio ? furniturePanelsRadio.value : '',
+        furnitureCounterFinish: furnitureCounterFinishRadio ? furnitureCounterFinishRadio.value : '',
+        furnitureCountertop: furnitureCountertopRadio ? furnitureCountertopRadio.value : '',
+        furnitureChangingTable: furnitureChangingTableRadio ? furnitureChangingTableRadio.value : '',
+        furnitureChairsOutdoor: furnitureChairsOutdoorRadio ? furnitureChairsOutdoorRadio.value : '',
+        furnitureChairsStack: furnitureChairsStackRadio ? furnitureChairsStackRadio.value : '',
+        furnitureStorage: furnitureStorageRadio ? furnitureStorageRadio.value : '',
+        furnitureDryerStorage: furnitureDryerStorageRadio ? furnitureDryerStorageRadio.value : '',
+        furnitureMedicalCouch: furnitureMedicalCouchRadio ? furnitureMedicalCouchRadio.value : '',
+        furnitureRecirculator: furnitureRecirculatorRadio ? furnitureRecirculatorRadio.value : '',
+        dryerCapacity: document.getElementById('furniture-dryer-capacity').value,
+        rackCapacity: document.getElementById('furniture-rack-capacity').value,
+        water: document.getElementById('furniture-water').value
+    };
+
+    console.log('🪑 Saving furniture data:', data);
+    
+    allObjectsData[currentObject.id].furniture.data = data;
     saveData();
 }
 
@@ -1099,6 +1165,29 @@ function loadObjectDataFromStorage() {
         if (boardsData.glassThickness) document.getElementById('boards-glass-thickness').value = boardsData.glassThickness;
     }
     
+    // Загрузка данных оснащения АБК (мебели)
+    if (data.furniture.data) {
+        const furnitureData = data.furniture.data;
+        
+        // Восстановить radio buttons с миграцией
+        restoreRadioButton('furniture-sharpener', furnitureData.furnitureSharpener, 'furniture', 1);
+        restoreRadioButton('furniture-lock', furnitureData.furnitureLock, 'furniture', 2);
+        restoreRadioButton('furniture-panels', furnitureData.furniturePanels, 'furniture', 3);
+        restoreRadioButton('furniture-counter-finish', furnitureData.furnitureCounterFinish, 'furniture', 4);
+        restoreRadioButton('furniture-countertop', furnitureData.furnitureCountertop, 'furniture', 5);
+        restoreRadioButton('furniture-changing-table', furnitureData.furnitureChangingTable, 'furniture', 8);
+        restoreRadioButton('furniture-chairs-outdoor', furnitureData.furnitureChairsOutdoor, 'furniture', 10);
+        restoreRadioButton('furniture-chairs-stack', furnitureData.furnitureChairsStack, 'furniture', 11);
+        restoreRadioButton('furniture-storage', furnitureData.furnitureStorage, 'furniture', 12);
+        restoreRadioButton('furniture-dryer-storage', furnitureData.furnitureDryerStorage, 'furniture', 13);
+        restoreRadioButton('furniture-medical-couch', furnitureData.furnitureMedicalCouch, 'furniture', 14);
+        restoreRadioButton('furniture-recirculator', furnitureData.furnitureRecirculator, 'furniture', 15);
+        
+        if (furnitureData.dryerCapacity) document.getElementById('furniture-dryer-capacity').value = furnitureData.dryerCapacity;
+        if (furnitureData.rackCapacity) document.getElementById('furniture-rack-capacity').value = furnitureData.rackCapacity;
+        if (furnitureData.water) document.getElementById('furniture-water').value = furnitureData.water;
+    }
+    
     // Загрузка данных инженерных систем
     if (data.systems.data) {
         const systemsData = data.systems.data;
@@ -1216,6 +1305,23 @@ function loadObjectDataFromStorage() {
         }
     }
     
+    // Обновление статусов для оснащения АБК (мебели)
+    for (let i = 1; i <= 15; i++) {
+        const status = data.furniture.statuses[i];
+        if (status && status !== 'pending') {
+            const statusElement = document.getElementById(`furniture-status-${i}`);
+            if (statusElement) {
+                if (status === 'pass') {
+                    statusElement.className = 'status-indicator status-pass';
+                    statusElement.textContent = '✓ Соответствует';
+                } else {
+                    statusElement.className = 'status-indicator status-fail';
+                    statusElement.textContent = '✗ Не соответствует';
+                }
+            }
+        }
+    }
+    
     // Обновление статусов для инженерных систем
     for (let i = 1; i <= 10; i++) {
         const status = data.systems.statuses[i];
@@ -1306,6 +1412,13 @@ function exportSummary() {
             } else if (section === 'boards') {
                 for (let i = 1; i <= 14; i++) {
                     const status = data.boards.statuses[i];
+                    if (status === 'pass') pass++;
+                    else if (status === 'fail') fail++;
+                    else pending++;
+                }
+            } else if (section === 'furniture') {
+                for (let i = 1; i <= 15; i++) {
+                    const status = data.furniture.statuses[i];
                     if (status === 'pass') pass++;
                     else if (status === 'fail') fail++;
                     else pending++;

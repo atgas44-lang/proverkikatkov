@@ -50,7 +50,7 @@
                 <div class="summary-cards">
                     <div class="summary-card">
                         <h4>Всего проверок</h4>
-                        <div class="value" id="totalChecks">506</div>
+                        <div class="value" id="totalChecks">825</div>
                     </div>
                     <div class="summary-card pass">
                         <h4>✅ Соответствует</h4>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="summary-card pending">
                         <h4>⏳ Не проверено</h4>
-                        <div class="value" id="globalPending">506</div>
+                        <div class="value" id="globalPending">825</div>
                     </div>
                 </div>
             </div>
@@ -1203,9 +1203,336 @@
                 
                 <div id="furniture" class="tab-content">
                     <div class="checklist">
-                        <p style="padding: 20px; text-align: center; color: #64748b;">
-                            Раздел в разработке. Будет добавлен после согласования критериев.
-                        </p>
+                        <!-- Критерии соответствия для мебели -->
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">1</span>
+                                Станок для заточки коньков с функцией полуавтоматической настройки?
+                                <span class="status-indicator status-pending" id="furniture-status-1">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-sharpener" value="yes" onchange="checkFurnitureStandard(1, true)">
+                                        Да, с полуавтоматикой
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-sharpener" value="no" onchange="checkFurnitureStandard(1, false)">
+                                        Нет / ручной
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Полуавтоматическая настройка обеспечивает единообразную заточку и снижает требования к квалификации персонала
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">2</span>
+                                Замок на шкафчик с возможностью программирования и установки временных паролей?
+                                <span class="status-indicator status-pending" id="furniture-status-2">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-lock" value="yes" onchange="checkFurnitureStandard(2, true)">
+                                        Да, программируемый
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-lock" value="no" onchange="checkFurnitureStandard(2, false)">
+                                        Нет / обычный
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Преимущества:</strong> Удобство для посетителей, отсутствие потерянных ключей, возможность удаленного управления
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">3</span>
+                                Панели шкафчиков из износостойкого покрытия?
+                                <span class="status-indicator status-pending" id="furniture-status-3">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-panels" value="yes" onchange="checkFurnitureStandard(3, true)">
+                                        Да, износостойкое
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-panels" value="no" onchange="checkFurnitureStandard(3, false)">
+                                        Нет / стандартное
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> HPL или компакт-ламинат толщиной не менее 6 мм для долговечности и вандалоустойчивости
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">4</span>
+                                Стойки проката и кофепоинта отделка структуры типа кашемир?
+                                <span class="status-indicator status-pending" id="furniture-status-4">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-counter-finish" value="yes" onchange="checkFurnitureStandard(4, true)">
+                                        Да, структура кашемир
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-counter-finish" value="no" onchange="checkFurnitureStandard(4, false)">
+                                        Нет / другая отделка
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Преимущества кашемира:</strong> Не оставляет отпечатков пальцев, легко чистится, премиальный внешний вид
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">5</span>
+                                Столешница стойки для проката и кофепоинта искусственный камень?
+                                <span class="status-indicator status-pending" id="furniture-status-5">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-countertop" value="yes" onchange="checkFurnitureStandard(5, true)">
+                                        Да, искусственный камень
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-countertop" value="no" onchange="checkFurnitureStandard(5, false)">
+                                        Нет / другой материал
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Искусственный камень обеспечивает гигиеничность, долговечность и ремонтопригодность
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">6</span>
+                                Количество пар коньков вмещается на сушилку для коньков?
+                                <span class="status-indicator status-pending" id="furniture-status-6">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" class="number-input" id="furniture-dryer-capacity" 
+                                    placeholder="Количество пар" 
+                                    onchange="checkFurnitureStandard(6, this.value >= 50)">
+                                <span>пар (минимум 50)</span>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Минимум 50 пар для обеспечения пропускной способности в часы пик
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">7</span>
+                                Сколько пар коньков вмещается на стеллаж для коньков?
+                                <span class="status-indicator status-pending" id="furniture-status-7">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" class="number-input" id="furniture-rack-capacity" 
+                                    placeholder="Количество пар" 
+                                    onchange="checkFurnitureStandard(7, this.value >= 50)">
+                                <span>пар (минимум 50)</span>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Минимум 50 пар для обеспечения достаточного ассортимента размеров
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">8</span>
+                                Пеленальный столик в комнату матери и ребёнка складной с пневматическими цилиндрами усиленный?
+                                <span class="status-indicator status-pending" id="furniture-status-8">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-changing-table" value="yes" onchange="checkFurnitureStandard(8, true)">
+                                        Да, с пневмоцилиндрами
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-changing-table" value="no" onchange="checkFurnitureStandard(8, false)">
+                                        Нет / обычный
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт безопасности:</strong> Пневматические цилиндры обеспечивают плавное складывание и предотвращают травмы
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">9</span>
+                                Обеспечение водой: на выбор пурифайер, питьевой фонтанчик, кулер, ничего?
+                                <span class="status-indicator status-pending" id="furniture-status-9">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <select class="select-input" id="furniture-water" onchange="checkWaterSupply(this.value)">
+                                    <option value="">-- Выберите тип --</option>
+                                    <option value="purifier">Пурифайер ✓</option>
+                                    <option value="fountain">Питьевой фонтанчик ✓</option>
+                                    <option value="cooler">Кулер</option>
+                                    <option value="none">Ничего</option>
+                                </select>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Пурифайер или питьевой фонтанчик - экологично, экономично, всегда доступная вода
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">10</span>
+                                Стулья в кафе антивандальные, устойчивые к УФ излучению и подходят под размещению на улице?
+                                <span class="status-indicator status-pending" id="furniture-status-10">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-chairs-outdoor" value="yes" onchange="checkFurnitureStandard(10, true)">
+                                        Да, универсальные
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-chairs-outdoor" value="no" onchange="checkFurnitureStandard(10, false)">
+                                        Нет / только для помещений
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Универсальные стулья позволяют организовывать летнее кафе и мероприятия на улице
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">11</span>
+                                Стулья в кафе с возможностью штабелирования?
+                                <span class="status-indicator status-pending" id="furniture-status-11">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-chairs-stack" value="yes" onchange="checkFurnitureStandard(11, true)">
+                                        Да, штабелируемые
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-chairs-stack" value="no" onchange="checkFurnitureStandard(11, false)">
+                                        Нет / обычные
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Преимущество:</strong> Экономия места при хранении, удобство при уборке и проведении мероприятий
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">12</span>
+                                Стеллажи для хранения в гараж и места для хранения усиленные?
+                                <span class="status-indicator status-pending" id="furniture-status-12">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-storage" value="yes" onchange="checkFurnitureStandard(12, true)">
+                                        Да, усиленные
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-storage" value="no" onchange="checkFurnitureStandard(12, false)">
+                                        Нет / стандартные
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Стандарт:</strong> Нагрузка не менее 300 кг на полку для хранения тяжелого инвентаря
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">13</span>
+                                Сушилка для коньков с функцией хранения?
+                                <span class="status-indicator status-pending" id="furniture-status-13">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-dryer-storage" value="yes" onchange="checkFurnitureStandard(13, true)">
+                                        Да, с хранением
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-dryer-storage" value="no" onchange="checkFurnitureStandard(13, false)">
+                                        Нет / только сушка
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Преимущество:</strong> Экономия места, удобство для проката - коньки всегда сухие и готовые к выдаче
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">14</span>
+                                Медицинская кушетка профессиональная и сертифицированная?
+                                <span class="status-indicator status-pending" id="furniture-status-14">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-medical-couch" value="yes" onchange="checkFurnitureStandard(14, true)">
+                                        Да, сертифицированная
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-medical-couch" value="no" onchange="checkFurnitureStandard(14, false)">
+                                        Нет / обычная
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>Требование:</strong> Сертификат соответствия медицинскому оборудованию обязателен для медкабинета
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checklist-question">
+                                <span class="question-number">15</span>
+                                Наличие бактерицидного рециркулятора в медицинском кабинете с обработкой минимум 30 м³ в час?
+                                <span class="status-indicator status-pending" id="furniture-status-15">Не заполнено</span>
+                            </div>
+                            <div class="input-group">
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-recirculator" value="yes" onchange="checkFurnitureStandard(15, true)">
+                                        Да, ≥30 м³/час
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="furniture-recirculator" value="no" onchange="checkFurnitureStandard(15, false)">
+                                        Нет / меньшей мощности
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="info-note">
+                                <strong>СанПиН требование:</strong> Минимум 30 м³/час для медкабинета площадью 15-20 м²
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1716,3 +2043,4 @@
     <script src="script-realtime.js"></script>
 </body>
 </html>
+
