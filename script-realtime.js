@@ -99,8 +99,8 @@ function initialize() {
     
     // Загрузка сохраненных данных
     if (useFirebase) {
-        // Не настраиваем автоматические слушатели для экономии запросов
-        // setupFirebaseListeners();
+        // Настраиваем слушатели для real-time обновлений по объектам
+        setupFirebaseListeners();
         loadAllDataFromFirebase();
     } else {
         loadAllDataFromLocalStorage();
@@ -115,33 +115,30 @@ function initialize() {
 
 // Настройка слушателей Firebase для real-time обновлений
 function setupFirebaseListeners() {
-    const dataRef = database.ref('equipmentCheckData');
-    
-    dataRef.on('value', (snapshot) => {
-        if (isSyncing) return; // Пропускаем обновление, если мы сами его вызвали
+    // Слушатель для каждого объекта отдельно
+    objects.forEach(obj => {
+        const objectRef = database.ref(`equipmentCheckData/${obj.id}`);
         
-        const data = snapshot.val();
-        if (data) {
-            console.log('📥 Получены обновления из Firebase');
+        objectRef.on('value', (snapshot) => {
+            if (isSyncing) return; // Пропускаем обновление, если мы сами его вызвали
             
-            // Обновляем локальные данные
-            Object.keys(data).forEach(objId => {
-                if (allObjectsData[objId]) {
-                    allObjectsData[objId] = mergeDeep(allObjectsData[objId], data[objId]);
+            const data = snapshot.val();
+            if (data) {
+                console.log(`📥 Получены обновления для объекта ${obj.id} из Firebase`);
+                
+                // Обновляем только данные этого объекта
+                allObjectsData[obj.id] = mergeDeep(allObjectsData[obj.id], data);
+                
+                // Обновляем сводную таблицу
+                updateSummaryTable();
+                
+                // Если открыт детальный вид для этого объекта, обновляем его
+                if (currentObject && currentObject.id === obj.id) {
+                    loadObjectDataFromStorage();
+                    showNotification(`Данные объекта "${obj.name}" обновлены другим пользователем`);
                 }
-            });
-            
-            // Обновляем UI
-            updateSummaryTable();
-            
-            // Если открыт детальный вид, обновляем его
-            if (currentObject) {
-                loadObjectDataFromStorage();
             }
-            
-            // Показать уведомление об обновлении
-            showNotification('Данные обновлены другим пользователем');
-        }
+        });
     });
     
     // Отслеживание подключения
@@ -791,15 +788,17 @@ function saveData() {
     }
 }
 
-// Сохранение в Firebase
+// Сохранение в Firebase - только текущий объект
 function saveToFirebase() {
-    if (!database) return;
+    if (!database || !currentObject) return;
     
     isSyncing = true; // Устанавливаем флаг для предотвращения циклических обновлений
     
-    database.ref('equipmentCheckData').set(allObjectsData)
+    // Сохраняем только данные текущего объекта
+    const objectId = currentObject.id;
+    database.ref(`equipmentCheckData/${objectId}`).set(allObjectsData[objectId])
         .then(() => {
-            console.log('✅ Данные сохранены в Firebase');
+            console.log(`✅ Данные объекта ${objectId} сохранены в Firebase`);
             isSyncing = false;
         })
         .catch((error) => {
@@ -807,6 +806,20 @@ function saveToFirebase() {
             // Резервное сохранение в localStorage
             saveToLocalStorage();
             isSyncing = false;
+        });
+}
+
+// Сохранение конкретного поля в Firebase (для максимальной гранулярности)
+function saveFieldToFirebase(objectId, section, field, value) {
+    if (!database) return;
+    
+    const path = `equipmentCheckData/${objectId}/${section}/${field}`;
+    database.ref(path).set(value)
+        .then(() => {
+            console.log(`✅ Поле ${path} сохранено в Firebase`);
+        })
+        .catch((error) => {
+            console.error('❌ Ошибка сохранения поля в Firebase:', error);
         });
 }
 
