@@ -50,6 +50,44 @@ body {
     border: 1px solid #a5b4fc;
 }
 
+.connection-status.manual {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Кнопка обновления */
+.refresh-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.refresh-btn:hover {
+    background: #2563eb;
+    transform: scale(1.02);
+}
+
+.refresh-btn:active {
+    transform: scale(0.98);
+}
+
+.refresh-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Уведомления */
 .notification {
     position: fixed;
@@ -119,6 +157,18 @@ body {
     .connection-status {
         font-size: 0.8em;
         padding: 6px 12px;
+    }
+    
+    .connection-status.manual {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .refresh-btn {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 0.9em;
     }
     
     /* Адаптация уведомлений для мобильных */

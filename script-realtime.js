@@ -99,7 +99,8 @@ function initialize() {
     
     // Загрузка сохраненных данных
     if (useFirebase) {
-        setupFirebaseListeners();
+        // Не настраиваем автоматические слушатели для экономии запросов
+        // setupFirebaseListeners();
         loadAllDataFromFirebase();
     } else {
         loadAllDataFromLocalStorage();
@@ -156,13 +157,7 @@ function updateConnectionStatus(connected = null) {
     
     console.log('🔗 Connection status changed:', connected);
     if (useFirebase) {
-        if (connected === null) {
-            statusHtml = '<div class="connection-status connecting">🔄 Подключение к серверу...</div>';
-        } else if (connected) {
-            statusHtml = '<div class="connection-status connected">🟢 Синхронизация включена</div>';
-        } else {
-            statusHtml = '<div class="connection-status disconnected">🔴 Нет подключения (работа оффлайн)</div>';
-        }
+        statusHtml = '<div class="connection-status manual">� Обновление по запросу <button class="refresh-btn" onclick="refreshDataFromServer()">� Обновить данные</button></div>';
     } else {
         statusHtml = '<div class="connection-status offline">💾 Локальный режим (только на этом устройстве)</div>';
     }
@@ -847,6 +842,58 @@ function loadAllDataFromFirebase() {
         .catch((error) => {
             console.error('❌ Ошибка загрузки из Firebase:', error);
             loadAllDataFromLocalStorage();
+        });
+}
+
+// Ручное обновление данных с сервера
+function refreshDataFromServer() {
+    if (!useFirebase || !database) {
+        showNotification('⚠️ Firebase не подключен, используется локальный режим');
+        return;
+    }
+    
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = '⏳ Загрузка...';
+    }
+    
+    console.log('🔄 Запрос обновления данных с сервера...');
+    
+    database.ref('equipmentCheckData').once('value')
+        .then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log('✅ Данные успешно обновлены с сервера');
+                Object.keys(data).forEach(objId => {
+                    if (allObjectsData[objId]) {
+                        allObjectsData[objId] = mergeDeep(allObjectsData[objId], data[objId]);
+                    }
+                });
+                
+                // Обновляем UI
+                updateSummaryTable();
+                
+                // Если открыт детальный вид, обновляем его
+                if (currentObject) {
+                    loadObjectDataFromStorage();
+                }
+                
+                showNotification('✅ Данные обновлены с сервера');
+            } else {
+                console.log('ℹ️ Нет данных на сервере');
+                showNotification('ℹ️ Нет данных на сервере');
+            }
+        })
+        .catch((error) => {
+            console.error('❌ Ошибка обновления данных:', error);
+            showNotification('❌ Ошибка обновления: ' + error.message);
+        })
+        .finally(() => {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 Обновить данные';
+            }
         });
 }
 
